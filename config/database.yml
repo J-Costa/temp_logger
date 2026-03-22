@@ -1,0 +1,35 @@
+# PostgreSQL
+#   gem install pg
+#
+#   Ensure the pg gem is defined in your Gemfile
+#   gem "pg"
+#
+#   To use Docker/TimescaleDB locally, set DATABASE_HOST, DATABASE_PORT,
+#   DATABASE_USER, DATABASE_PASSWORD and DATABASE_NAME (optional).
+#   See docker-compose.yml for defaults.
+#
+default: &default
+  adapter: postgresql
+  encoding: unicode
+  pool: <%= ENV.fetch("RAILS_MAX_THREADS") { 5 } %>
+  host: <%= ENV.fetch("DATABASE_HOST", "localhost") %>
+  port: <%= ENV.fetch("DATABASE_PORT", 6543) %>
+  username: <%= ENV.fetch("DATABASE_USER", "postgres") %>
+  password: <%= ENV.fetch("DATABASE_PASSWORD", "password") %>
+
+development:
+  <<: *default
+  database: <%= ENV.fetch("DATABASE_NAME", "temp_logger_development") %>
+
+# Warning: The database defined as "test" will be erased and
+# re-generated from your development database when you run "rake".
+# Do not set this db to the same as development or production.
+test:
+  <<: *default
+  database: <%= ENV.fetch("TEST_DATABASE_NAME", "temp_logger_test") %>
+
+production:
+  <<: *default
+  database: <%= ENV.fetch("DATABASE_NAME", "temp_logger_production") %>
+  # In production, prefer DATABASE_URL when available.
+  url: <%= ENV["DATABASE_URL"] if ENV["DATABASE_URL"].present? %>
