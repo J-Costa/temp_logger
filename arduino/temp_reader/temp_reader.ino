@@ -8,7 +8,7 @@ const int pinTermistor = A0;
 // Parâmetros do termistor
 const double beta = 3600.0;
 const double r0 = 10000.0;
-const double t0 = 273.0 + 25.0;
+const double t0 = 273.15 + 25.0;
 const double rx = r0 * exp(-beta/t0);
 
 // Parâmetros do circuito
@@ -33,12 +33,12 @@ void loop() {
   }
 
   // Determina a resistência do termistor
-  double v = (vcc*soma)/(nAmostras*1024.0);
+  double v = (vcc*soma)/(nAmostras*1023.0);
   double rt = (vcc*R)/v - R;
 
   // Calcula a temperatura
   double t = beta / log(rt/rx);
-  Serial.println (t-273.0);
+  Serial.println (t-273.15);
 
   // Dá um tempo entre leituras
   delay (1000);

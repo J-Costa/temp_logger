@@ -1,15 +1,18 @@
 source "https://rubygems.org"
 
-ruby "3.3.4"
+ruby "4.0.2"
 
 # Bundle edge Rails instead: gem "rails", github: "rails/rails", branch: "main"
-gem "rails", "~> 7.1.3", ">= 7.1.3.4"
+gem "rails", "~> 8.1"
 
 # The original asset pipeline for Rails [https://github.com/rails/sprockets-rails]
 gem "sprockets-rails"
 
 # Use PostgreSQL as the database for Active Record
 gem "pg", "~> 1.5"
+
+# Read temperature data from an Arduino over USB serial
+gem "serialport", "~> 1.3"
 
 # Use the Puma web server [https://github.com/puma/puma]
 gem "puma", ">= 5.0"

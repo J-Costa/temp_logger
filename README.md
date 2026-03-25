@@ -44,6 +44,44 @@ Banco padrao:
 
 	bin/rails db:migrate
 
+## Ler dados do Arduino (NTC via serial USB)
+
+O sketch do Arduino envia uma linha por segundo com a temperatura em Celsius.
+Este projeto inclui uma task para ler a serial e salvar no banco.
+
+1. Instale as gems (inclui serialport):
+
+	bundle install
+
+2. Configure a porta serial no `.env` (ou via export):
+
+	SERIAL_PORT=/dev/ttyACM0
+	SERIAL_BAUD=9600
+
+3. Rode as migracoes para criar a tabela de leituras:
+
+	bin/rails db:migrate
+
+4. Leia uma amostra de teste:
+
+	bin/rake arduino:read_once
+
+5. Rode a leitura continua:
+
+	bin/rake arduino:read_serial
+
+Para ver os dados no webapp, acesse a raiz da aplicacao (`/`) ou:
+
+	/temperature_readings
+
+### Dica para Raspberry Pi
+
+Em geral, o usuario precisa de permissao no grupo `dialout` para acessar `/dev/ttyACM0`:
+
+	sudo usermod -aG dialout $USER
+
+Depois, saia e entre novamente na sessao.
+
 ## Extensao TimescaleDB
 
 O projeto inclui o script `docker/timescaledb/init/001_enable_timescaledb.sql`.
