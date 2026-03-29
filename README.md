@@ -110,3 +110,44 @@ CREATE EXTENSION IF NOT EXISTS timescaledb;
 - Derrubar servicos:
 
   docker compose down
+
+## Servicos systemd no Raspberry Pi
+
+Este repositorio inclui dois unit files para iniciar automaticamente no boot:
+
+- deploy/systemd/temp_logger_reader.service
+- deploy/systemd/temp_logger_web.service
+
+### Instalar os servicos
+
+1. Copie os unit files para o systemd:
+
+sudo install -m 644 deploy/systemd/temp_logger_reader.service /etc/systemd/system/temp_logger_reader.service
+sudo install -m 644 deploy/systemd/temp_logger_web.service /etc/systemd/system/temp_logger_web.service
+
+2. Recarregue o systemd e habilite os dois servicos:
+
+sudo systemctl daemon-reload
+sudo systemctl enable --now temp_logger_reader.service
+sudo systemctl enable --now temp_logger_web.service
+
+3. Verifique status e logs:
+
+systemctl status temp_logger_reader.service
+systemctl status temp_logger_web.service
+journalctl -u temp_logger_reader.service -f
+journalctl -u temp_logger_web.service -f
+
+### Acesso via rede local
+
+Descubra o IP do Raspberry e abra no navegador de outro dispositivo na mesma rede:
+
+hostname -I
+
+Use o endereco:
+
+http://IP_DO_RASPBERRY:3000
+
+Se houver firewall ativo:
+
+sudo ufw allow 3000/tcp

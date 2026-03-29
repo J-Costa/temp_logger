@@ -1,0 +1,25 @@
+[Unit]
+Description=Temp Logger - leitura continua do Arduino
+After=network.target docker.service
+Wants=network.target docker.service
+Requires=docker.service
+
+[Service]
+Type=simple
+User=jc
+SupplementaryGroups=dialout
+WorkingDirectory=/home/jc/dev/temp_logger
+Environment=RAILS_ENV=production
+EnvironmentFile=-/home/jc/dev/temp_logger/.env
+Environment=SERIAL_PORT=/dev/ttyACM0
+Environment=SERIAL_BAUD=9600
+Environment=SERIAL_POLL_INTERVAL_SECONDS=60
+ExecStartPre=/usr/bin/env bash -lc 'docker compose up -d'
+ExecStart=/usr/bin/env bash -lc 'eval "$(mise env -s bash)"; bundle exec rake arduino:read_serial'
+Restart=always
+RestartSec=5
+StandardOutput=journal
+StandardError=journal
+
+[Install]
+WantedBy=multi-user.target

@@ -16,30 +16,42 @@ const double vcc = 5.0;
 const double R = 10000.0;
 
 // Numero de amostras na leitura
-const int nAmostras = 5;
+const int numberOfSamples = 5;
 
-// Iniciação
+double readTemperatureInCelsius() {
+  // Reads multiple samples from the termistor and averages them
+  int sum = 0;
+  for (int i = 0; i < numberOfSamples; i++) {
+    sum += analogRead(pinTermistor);
+    delay(10);
+  }
+
+  // Determines the resistance of the termistor
+  double v = (vcc * sum) / (numberOfSamples * 1023.0);
+  double rt = (vcc * R) / v - R;
+
+  // Calcula a temperatura em graus Celsius
+  double t = beta / log(rt / rx);
+  return t - 273.15;
+}
+
+// Initialization
 void setup() {
   Serial.begin(9600);
 }
 
-// Laço perpétuo
+// Infinite loop
 void loop() {
-  // Le o sensor algumas vezes
-  int soma = 0;
-  for (int i = 0; i < nAmostras; i++) {
-    soma += analogRead(pinTermistor);
-    delay (10);
+  if (Serial.available() > 0) {
+    String command = Serial.readStringUntil('\n');
+    command.trim();
+
+    // Simple request/response protocol
+    if (command == "READ") {
+      double temperatureCelsius = readTemperatureInCelsius();
+      Serial.println(temperatureCelsius, 2);
+    } else {
+      Serial.println("ERR");
+    }
   }
-
-  // Determina a resistência do termistor
-  double v = (vcc*soma)/(nAmostras*1023.0);
-  double rt = (vcc*R)/v - R;
-
-  // Calcula a temperatura
-  double t = beta / log(rt/rx);
-  Serial.println (t-273.15);
-
-  // Dá um tempo entre leituras
-  delay (1000);
 }

@@ -1,0 +1,23 @@
+[Unit]
+Description=Temp Logger - servidor Rails na rede local
+After=network.target docker.service
+Wants=network.target docker.service
+Requires=docker.service
+
+[Service]
+Type=simple
+User=jc
+WorkingDirectory=/home/jc/dev/temp_logger
+Environment=RAILS_ENV=production
+EnvironmentFile=-/home/jc/dev/temp_logger/.env
+ExecStartPre=/usr/bin/env bash -lc 'docker compose up -d'
+ExecStartPre=/usr/bin/env bash -lc 'eval "$(mise env -s bash)"; bundle exec rails db:prepare'
+ExecStartPre=/usr/bin/env bash -lc 'eval "$(mise env -s bash)"; bundle exec rails assets:precompile'
+ExecStart=/usr/bin/env bash -lc 'eval "$(mise env -s bash)"; bundle exec rails server -b 0.0.0.0 -p 3000'
+Restart=always
+RestartSec=5
+StandardOutput=journal
+StandardError=journal
+
+[Install]
+WantedBy=multi-user.target

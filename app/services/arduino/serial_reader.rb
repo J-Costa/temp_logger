@@ -2,6 +2,8 @@ module Arduino
   class SerialReader
     DEFAULT_BAUD_RATE = 9_600
     DEFAULT_READ_TIMEOUT_MS = 2_000
+    DEFAULT_POLL_INTERVAL_SECONDS = 60
+    REQUEST_COMMAND = "READ\n"
 
     def initialize(port:, baud_rate: DEFAULT_BAUD_RATE, io_factory: SerialPort)
       @port = port
@@ -9,12 +11,19 @@ module Arduino
       @io_factory = io_factory
     end
 
-    def run_forever
+    def run_forever(poll_interval_seconds: DEFAULT_POLL_INTERVAL_SECONDS)
       with_serial do |serial|
-        Rails.logger.info("[Arduino::SerialReader] Listening on #{@port} at #{@baud_rate} baud")
+        Rails.logger.info(
+          "[Arduino::SerialReader] Listening on #{@port} at #{@baud_rate} baud (interval=#{poll_interval_seconds}s)"
+        )
 
         loop do
+          started_at = Process.clock_gettime(Process::CLOCK_MONOTONIC)
           read_and_persist(serial)
+
+          elapsed = Process.clock_gettime(Process::CLOCK_MONOTONIC) - started_at
+          sleep_seconds = poll_interval_seconds - elapsed
+          sleep(sleep_seconds) if sleep_seconds.positive?
         end
       end
     end
@@ -42,11 +51,13 @@ module Arduino
     end
 
     def read_and_persist(serial)
+      serial.write(REQUEST_COMMAND)
       raw_line = serial.gets
       return false if raw_line.nil?
 
       payload = raw_line.strip
       return false if payload.empty?
+      return false if payload == "ERR"
 
       temperature = parse_temperature(payload)
       return false if temperature.nil?
