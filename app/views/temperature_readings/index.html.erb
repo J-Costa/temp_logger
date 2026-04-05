@@ -1,7 +1,7 @@
 <h1>Ultimas leituras de temperatura</h1>
 
 <p>
-  Total exibido: <%= @temperature_readings.size %>
+  Total exibido: <%= @temperature_readings.size %> - Média das últimas 24 horas: <%= format("%.2f", @average_temperature) %> °C
 </p>
 
 <table>
@@ -16,7 +16,7 @@
   <tbody>
     <% @temperature_readings.each do |reading| %>
       <tr>
-        <td><%= reading.recorded_at&.in_time_zone&.strftime("%Y-%m-%d %H:%M:%S") %></td>
+        <td><%= reading.recorded_at&.in_time_zone("America/Sao_Paulo")&.strftime("%Y-%m-%d %H:%M:%S") %></td>
         <td><%= format("%.2f", reading.temperature_c) %></td>
         <td><%= reading.source %></td>
         <td><%= reading.serial_port.presence || "-" %></td>

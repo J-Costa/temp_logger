@@ -1,6 +1,7 @@
 class TemperatureReadingsController < ApplicationController
   def index
     @temperature_readings = TemperatureReading.order(recorded_at: :desc).limit(100)
+    @average_temperature = TemperatureReading.where(recorded_at: 24.hours.ago..).average(:temperature_c)
 
     respond_to do |format|
       format.html

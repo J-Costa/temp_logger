@@ -1,0 +1,11 @@
+recent:
+  temperature_c: 20.5
+  recorded_at: 2026-04-04 10:00:00
+  source: arduino
+  serial_port: /dev/ttyUSB0
+
+old:
+  temperature_c: 30.0
+  recorded_at: 2026-04-03 05:00:00
+  source: arduino
+  serial_port: /dev/ttyUSB1
