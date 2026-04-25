@@ -7,6 +7,7 @@ export default class extends Controller {
   static targets = ["canvas"]
   static values = {
     points: Array,
+    series: Object,
   }
 
   connect() {
@@ -19,7 +20,13 @@ export default class extends Controller {
   }
 
   renderChart() {
-    if (!this.hasCanvasTarget || !this.pointsValue?.length) {
+    if (!this.hasCanvasTarget) {
+      return
+    }
+
+    const series = this.resolveSeries()
+
+    if (!series || !series.labels.length || !series.datasets.length) {
       return
     }
 
@@ -30,30 +37,13 @@ export default class extends Controller {
     }
 
     this.chart?.destroy()
-
-    const labels = this.pointsValue.map((point) => point.label)
-    const temperatures = this.pointsValue.map((point) => Number(point.value))
+    const datasets = this.buildDatasets(series.datasets)
 
     this.chart = new Chart(context, {
       type: "line",
       data: {
-        labels,
-        datasets: [
-          {
-            label: "Temperatura",
-            data: temperatures,
-            borderColor: "#0f766e",
-            backgroundColor: "rgba(15, 118, 110, 0.16)",
-            borderWidth: 2,
-            fill: true,
-            tension: 0.35,
-            pointBackgroundColor: "#0f766e",
-            pointBorderColor: "#ffffff",
-            pointBorderWidth: 2,
-            pointRadius: 3,
-            pointHoverRadius: 5,
-          },
-        ],
+        labels: series.labels,
+        datasets,
       },
       options: {
         responsive: true,
@@ -64,12 +54,12 @@ export default class extends Controller {
         },
         plugins: {
           legend: {
-            display: false,
+            display: datasets.length > 1,
           },
           tooltip: {
-            displayColors: false,
+            displayColors: true,
             callbacks: {
-              label: (context) => `${context.parsed.y.toFixed(2)} °C`,
+              label: (context) => `${context.dataset.label}: ${context.parsed.y.toFixed(2)} °C`,
             },
           },
         },
@@ -96,6 +86,68 @@ export default class extends Controller {
           },
         },
       },
+    })
+  }
+
+  resolveSeries() {
+    if (this.hasSeriesValue && this.seriesValue?.labels?.length && this.seriesValue?.datasets?.length) {
+      return this.seriesValue
+    }
+
+    if (this.pointsValue?.length) {
+      return {
+        labels: this.pointsValue.map((point) => point.label),
+        datasets: [
+          {
+            key: "legacy",
+            label: "Temperatura",
+            values: this.pointsValue.map((point) => Number(point.value)),
+          },
+        ],
+      }
+    }
+
+    return null
+  }
+
+  buildDatasets(rawDatasets) {
+    const palette = {
+      arduino: {
+        borderColor: "#0f766e",
+        backgroundColor: "rgba(15, 118, 110, 0.16)",
+      },
+      open_meteo: {
+        borderColor: "#ea580c",
+        backgroundColor: "rgba(234, 88, 12, 0.16)",
+      },
+      legacy: {
+        borderColor: "#0f766e",
+        backgroundColor: "rgba(15, 118, 110, 0.16)",
+      },
+    }
+
+    return rawDatasets.map((dataset, index) => {
+      const colors = palette[dataset.key] || {
+        borderColor: "#334155",
+        backgroundColor: "rgba(51, 65, 85, 0.12)",
+      }
+
+      return {
+        label: dataset.label,
+        data: dataset.values.map((value) => (value == null ? null : Number(value))),
+        borderColor: colors.borderColor,
+        backgroundColor: colors.backgroundColor,
+        borderWidth: 2,
+        fill: true,
+        tension: 0.35,
+        spanGaps: true,
+        pointBackgroundColor: colors.borderColor,
+        pointBorderColor: "#ffffff",
+        pointBorderWidth: 2,
+        pointRadius: 3,
+        pointHoverRadius: 5,
+        order: index,
+      }
     })
   }
 }

@@ -13,12 +13,7 @@ class TemperatureReadingsController < ApplicationController
 
     @average_temperature_filtered = readings.average(:temperature_c) || 0
     @temperature_readings = readings.limit(PER_PAGE).to_a
-    @chart_points = @temperature_readings.reverse.map do |reading|
-      {
-        label: helpers.format_temperature_recorded_at(reading.recorded_at),
-        value: reading.temperature_c.to_f
-      }
-    end
+    @chart_series = build_chart_series(@temperature_readings.reverse)
     @average_temperature = TemperatureReading.where(recorded_at: 24.hours.ago..).average(:temperature_c) || 0
 
     respond_to do |format|
@@ -61,6 +56,54 @@ class TemperatureReadingsController < ApplicationController
       )
     else 
       relation
+    end
+  end
+
+  def build_chart_series(readings)
+    labels = readings.map { |reading| helpers.format_temperature_recorded_at(reading.recorded_at) }.uniq
+
+    datasets = readings
+      .group_by(&:source)
+      .sort_by { |(source, _)| source_sort_order(source) }
+      .map do |(source, source_readings)|
+        values_by_label = {}
+        source_readings.each do |reading|
+          label = helpers.format_temperature_recorded_at(reading.recorded_at)
+          values_by_label[label] = reading.temperature_c.to_f
+        end
+
+        {
+          key: source,
+          label: source_display_name(source),
+          values: labels.map { |label| values_by_label[label] }
+        }
+      end
+
+    {
+      labels: labels,
+      datasets: datasets
+    }
+  end
+
+  def source_sort_order(source)
+    case source
+    when TemperatureReading::SOURCE_ARDUINO
+      0
+    when TemperatureReading::SOURCE_OPEN_METEO
+      1
+    else
+      99
+    end
+  end
+
+  def source_display_name(source)
+    case source
+    when TemperatureReading::SOURCE_ARDUINO
+      "Arduino"
+    when TemperatureReading::SOURCE_OPEN_METEO
+      "Open-Meteo"
+    else
+      source.to_s.titleize
     end
   end
 end

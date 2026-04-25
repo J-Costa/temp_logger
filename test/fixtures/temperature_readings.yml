@@ -9,3 +9,8 @@ old:
   recorded_at: 2026-04-03 05:00:00
   source: arduino
   serial_port: /dev/ttyUSB1
+
+open_meteo_recent:
+  temperature_c: 19.3
+  recorded_at: 2026-04-02 08:00:00
+  source: open_meteo

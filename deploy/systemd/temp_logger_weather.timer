@@ -1,0 +1,11 @@
+[Unit]
+Description=Temp Logger - agendamento da coleta externa Open-Meteo
+
+[Timer]
+OnBootSec=2min
+OnUnitActiveSec=10min
+Unit=temp_logger_weather.service
+Persistent=true
+
+[Install]
+WantedBy=timers.target

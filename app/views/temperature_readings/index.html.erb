@@ -32,7 +32,7 @@
       <%= render "temperature_filter", time_range: @time_range, temp_range: @temp_range %>
     </section>
 
-    <%= render "temperature_chart", chart_points: @chart_points %>
+    <%= render "temperature_chart", chart_series: @chart_series %>
 
     <section id="temperature-readings-list">
       <%= render "temperature_readings_list", temperature_readings: @temperature_readings %>

@@ -1,0 +1,19 @@
+[Unit]
+Description=Temp Logger - coleta externa Open-Meteo
+After=network.target docker.service
+Wants=network.target docker.service
+Requires=docker.service
+
+[Service]
+Type=oneshot
+User=jc
+WorkingDirectory=/home/jc/dev/temp_logger
+Environment=RAILS_ENV=production
+EnvironmentFile=-/home/jc/dev/temp_logger/.env
+Environment=WEATHER_LATITUDE=-23.5505
+Environment=WEATHER_LONGITUDE=-46.6333
+Environment=WEATHER_TIMEZONE=America/Sao_Paulo
+ExecStartPre=/usr/bin/env bash -lc 'docker compose up -d'
+ExecStart=/usr/bin/env bash -lc 'eval "$(mise env -s bash)"; bundle exec rake weather:fetch'
+StandardOutput=journal
+StandardError=journal

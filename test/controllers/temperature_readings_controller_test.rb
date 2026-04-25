@@ -20,4 +20,22 @@ class TemperatureReadingsControllerTest < ActionDispatch::IntegrationTest
       assert_includes response.body, expected_timestamp
     end
   end
+
+  test "index renders chart series grouped by source" do
+    travel_to Time.utc(2026, 4, 4, 12, 0, 0) do
+      TemperatureReading.create!(
+        temperature_c: 21.4,
+        recorded_at: Time.utc(2026, 4, 4, 10, 30, 0),
+        source: TemperatureReading::SOURCE_OPEN_METEO,
+        raw_payload: "{\"current\":{\"temperature_2m\":21.4}}"
+      )
+
+      get temperature_readings_url
+
+      assert_response :success
+      assert_includes response.body, "data-chart-series-value"
+      assert_includes response.body, "Arduino"
+      assert_includes response.body, "Open-Meteo"
+    end
+  end
 end

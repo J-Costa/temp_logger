@@ -1,12 +1,12 @@
 <section id="temperature-readings-chart" class="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
   <h2 class="mb-4 text-lg font-semibold text-slate-900">Tendência de Temperatura</h2>
 
-  <% if chart_points.any? %>
+  <% if chart_series[:labels].any? && chart_series[:datasets].any? %>
     <div class="rounded-2xl bg-slate-50 p-4">
       <div
         class="h-80"
         data-controller="chart"
-        data-chart-points-value="<%= json_escape(chart_points.to_json) %>"
+        data-chart-series-value="<%= json_escape(chart_series.to_json) %>"
       >
         <canvas data-chart-target="canvas" aria-label="Gráfico de tendência de temperatura" role="img" class="h-full w-full"></canvas>
       </div>

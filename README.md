@@ -82,6 +82,30 @@ Em geral, o usuario precisa de permissao no grupo `dialout` para acessar `/dev/t
 
 Depois, saia e entre novamente na sessao.
 
+## Ler temperatura externa (Open-Meteo)
+
+Tambem e possivel coletar temperatura externa para comparacao no grafico.
+As leituras externas sao salvas na mesma tabela usando `source: open_meteo`.
+
+### Coleta unica
+
+bin/rake weather:fetch
+
+### Variaveis opcionais
+
+- WEATHER_LATITUDE (padrao: -23.5505)
+- WEATHER_LONGITUDE (padrao: -46.6333)
+- WEATHER_TIMEZONE (padrao: America/Sao_Paulo)
+
+Exemplo:
+
+WEATHER_LATITUDE=-23.5505 WEATHER_LONGITUDE=-46.6333 WEATHER_TIMEZONE=America/Sao_Paulo bin/rake weather:fetch
+
+### Coleta periodica (recomendado)
+
+Agende a task `weather:fetch` em um timer systemd ou cron para executar periodicamente.
+Uma frequencia inicial de 10 minutos costuma ser um bom equilibrio para comparacao visual.
+
 ## Extensao TimescaleDB
 
 O projeto inclui o script `docker/timescaledb/init/001_enable_timescaledb.sql`.
@@ -117,6 +141,8 @@ Este repositorio inclui dois unit files para iniciar automaticamente no boot:
 
 - deploy/systemd/temp_logger_reader.service
 - deploy/systemd/temp_logger_web.service
+- deploy/systemd/temp_logger_weather.service
+- deploy/systemd/temp_logger_weather.timer
 
 ### Instalar os servicos
 
@@ -124,19 +150,25 @@ Este repositorio inclui dois unit files para iniciar automaticamente no boot:
 
 sudo install -m 644 deploy/systemd/temp_logger_reader.service /etc/systemd/system/temp_logger_reader.service
 sudo install -m 644 deploy/systemd/temp_logger_web.service /etc/systemd/system/temp_logger_web.service
+sudo install -m 644 deploy/systemd/temp_logger_weather.service /etc/systemd/system/temp_logger_weather.service
+sudo install -m 644 deploy/systemd/temp_logger_weather.timer /etc/systemd/system/temp_logger_weather.timer
 
 2. Recarregue o systemd e habilite os dois servicos:
 
 sudo systemctl daemon-reload
 sudo systemctl enable --now temp_logger_reader.service
 sudo systemctl enable --now temp_logger_web.service
+sudo systemctl enable --now temp_logger_weather.timer
 
 3. Verifique status e logs:
 
 systemctl status temp_logger_reader.service
 systemctl status temp_logger_web.service
+systemctl status temp_logger_weather.timer
+systemctl status temp_logger_weather.service
 journalctl -u temp_logger_reader.service -f
 journalctl -u temp_logger_web.service -f
+journalctl -u temp_logger_weather.service -f
 
 ### Acesso via rede local
 

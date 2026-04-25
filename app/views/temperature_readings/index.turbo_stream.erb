@@ -1,2 +1,2 @@
-<%= turbo_stream.replace("temperature-readings-chart", partial: "temperature_chart", locals: { chart_points: @chart_points }) %>
+<%= turbo_stream.replace("temperature-readings-chart", partial: "temperature_chart", locals: { chart_series: @chart_series }) %>
 <%= turbo_stream.replace("temperature-readings-list", partial: "temperature_readings_list") %>
