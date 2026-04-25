@@ -11,10 +11,14 @@ class TemperatureReadingsController < ApplicationController
     readings = filter_by_time_range(readings, @time_range)
     readings = filter_by_temperature_range(readings, @temp_range)
 
-    Rails.logger.debug("Filter applied: time_range=#{@time_range}, temp_range=#{@temp_range}, count=#{readings.count}")
-
     @average_temperature_filtered = readings.average(:temperature_c) || 0
-    @temperature_readings = readings.limit(PER_PAGE)
+    @temperature_readings = readings.limit(PER_PAGE).to_a
+    @chart_points = @temperature_readings.reverse.map do |reading|
+      {
+        label: helpers.format_temperature_recorded_at(reading.recorded_at),
+        value: reading.temperature_c.to_f
+      }
+    end
     @average_temperature = TemperatureReading.where(recorded_at: 24.hours.ago..).average(:temperature_c) || 0
 
     respond_to do |format|
@@ -38,7 +42,7 @@ class TemperatureReadingsController < ApplicationController
       relation.where(recorded_at: 7.days.ago..)
     when "all"
       relation
-    else # "24h" é o padrão
+    else 
       relation.where(recorded_at: 24.hours.ago..)
     end
   end
@@ -55,7 +59,7 @@ class TemperatureReadingsController < ApplicationController
         TemperatureReadingsHelper::COLD_TEMPERATURE_C,
         TemperatureReadingsHelper::HOT_TEMPERATURE_C
       )
-    else # "all"
+    else 
       relation
     end
   end

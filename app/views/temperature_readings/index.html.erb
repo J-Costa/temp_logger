@@ -32,12 +32,7 @@
       <%= render "temperature_filter", time_range: @time_range, temp_range: @temp_range %>
     </section>
 
-    <section class="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
-      <h2 class="mb-4 text-lg font-semibold text-slate-900">Tendência de Temperatura</h2>
-      <div id="chart-container" class="flex items-center justify-center rounded-2xl bg-slate-50 py-12">
-        <p class="text-slate-500">Gráfico será exibido aqui</p>
-      </div>
-    </section>
+    <%= render "temperature_chart", chart_points: @chart_points %>
 
     <section id="temperature-readings-list">
       <%= render "temperature_readings_list", temperature_readings: @temperature_readings %>

@@ -1,0 +1,20 @@
+<section id="temperature-readings-chart" class="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
+  <h2 class="mb-4 text-lg font-semibold text-slate-900">Tendência de Temperatura</h2>
+
+  <% if chart_points.any? %>
+    <div class="rounded-2xl bg-slate-50 p-4">
+      <div
+        class="h-80"
+        data-controller="chart"
+        data-chart-points-value="<%= json_escape(chart_points.to_json) %>"
+      >
+        <canvas data-chart-target="canvas" aria-label="Gráfico de tendência de temperatura" role="img" class="h-full w-full"></canvas>
+      </div>
+    </div>
+  <% else %>
+    <div class="rounded-2xl border border-dashed border-slate-300 bg-slate-50 px-6 py-10 text-center">
+      <p class="text-sm font-medium text-slate-700">Sem dados suficientes para montar o gráfico</p>
+      <p class="mt-2 text-sm text-slate-500">Ajuste os filtros ou aguarde novas leituras.</p>
+    </div>
+  <% end %>
+</section>

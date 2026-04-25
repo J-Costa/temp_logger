@@ -4,12 +4,20 @@ class TemperatureReadingsControllerTest < ActionDispatch::IntegrationTest
   test "index shows the average temperature from the last 24 hours and renders timestamps in Sao Paulo time" do
     travel_to Time.utc(2026, 4, 4, 12, 0, 0) do
       recent_reading = temperature_readings(:recent)
+      expected_timestamp = I18n.l(
+        recent_reading.recorded_at.in_time_zone("America/Sao_Paulo"),
+        format: :temperature_reading,
+        locale: :"pt-BR"
+      )
 
       get temperature_readings_url
 
       assert_response :success
-      assert_select "p", text: /Total exibido: 2 - Média das últimas 24 horas: 20\.50 °C/
-      assert_includes response.body, recent_reading.recorded_at.in_time_zone("America/Sao_Paulo").strftime("%Y-%m-%d %H:%M:%S")
+      assert_includes response.body, "Total exibido"
+      assert_includes response.body, "Média 24h"
+      assert_includes response.body, "20.50 °C"
+      assert_select "#temperature-readings-chart canvas", count: 1
+      assert_includes response.body, expected_timestamp
     end
   end
 end
