@@ -34,4 +34,8 @@ module TemperatureReadingsHelper
       locale: :"pt-BR"
     )
   end
+
+  def selected_option(current_value, option_value)
+    current_value == option_value ? "selected" : ""
+  end
 end

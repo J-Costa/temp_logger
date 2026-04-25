@@ -1,0 +1,67 @@
+<% if temperature_readings.any? %>
+  <section class="md:hidden space-y-3">
+    <% temperature_readings.each do |reading| %>
+      <% temperature = reading.temperature_c.to_f %>
+
+      <article class="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
+        <div class="flex items-start justify-between gap-4">
+          <div>
+            <p class="text-xs uppercase tracking-wide text-slate-500">Horário</p>
+            <p class="mt-1 text-sm font-semibold text-slate-800"><%= format_temperature_recorded_at(reading.recorded_at) %></p>
+          </div>
+          <span class="inline-flex rounded-xl border px-3 py-1 text-sm font-semibold <%= temperature_badge_classes(temperature, with_border: true) %>">
+            <%= format("%.2f", temperature) %> °C
+          </span>
+        </div>
+
+        <div class="mt-4 grid grid-cols-2 gap-3 text-sm">
+          <div class="rounded-xl bg-slate-50 p-3">
+            <p class="text-xs uppercase tracking-wide text-slate-500">Origem</p>
+            <p class="mt-1 font-medium text-slate-800"><%= reading.source.presence || "-" %></p>
+          </div>
+          <div class="rounded-xl bg-slate-50 p-3">
+            <p class="text-xs uppercase tracking-wide text-slate-500">Porta</p>
+            <p class="mt-1 font-medium text-slate-800"><%= reading.serial_port.presence || "-" %></p>
+          </div>
+        </div>
+      </article>
+    <% end %>
+  </section>
+
+  <section class="hidden md:block">
+    <div class="overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm">
+      <div class="overflow-x-auto">
+        <table class="min-w-full divide-y divide-slate-200 text-sm">
+          <thead class="bg-slate-50">
+            <tr>
+              <th scope="col" class="px-6 py-4 text-left font-semibold uppercase tracking-wide text-slate-600">Horário</th>
+              <th scope="col" class="px-6 py-4 text-left font-semibold uppercase tracking-wide text-slate-600">Temperatura</th>
+              <th scope="col" class="px-6 py-4 text-left font-semibold uppercase tracking-wide text-slate-600">Origem</th>
+              <th scope="col" class="px-6 py-4 text-left font-semibold uppercase tracking-wide text-slate-600">Porta</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-slate-100 bg-white">
+            <% temperature_readings.each do |reading| %>
+              <% temperature = reading.temperature_c.to_f %>
+              <tr class="transition-colors hover:bg-slate-50/80">
+                <td class="whitespace-nowrap px-6 py-4 font-medium text-slate-800"><%= format_temperature_recorded_at(reading.recorded_at) %></td>
+                <td class="whitespace-nowrap px-6 py-4">
+                  <span class="inline-flex rounded-xl px-3 py-1 text-sm font-semibold <%= temperature_badge_classes(temperature) %>">
+                    <%= format("%.2f", temperature) %> °C
+                  </span>
+                </td>
+                <td class="px-6 py-4 text-slate-700"><%= reading.source.presence || "-" %></td>
+                <td class="px-6 py-4 text-slate-700"><%= reading.serial_port.presence || "-" %></td>
+              </tr>
+            <% end %>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+<% else %>
+  <section class="rounded-3xl border border-dashed border-slate-300 bg-white p-10 text-center shadow-sm">
+    <h2 class="text-lg font-semibold text-slate-800">Sem leituras no período selecionado</h2>
+    <p class="mt-2 text-sm text-slate-600">Ajuste os filtros ou volte mais tarde.</p>
+  </section>
+<% end %>

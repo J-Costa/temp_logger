@@ -1,0 +1,69 @@
+<form method="get" data-controller="filters" data-filters-target="form" class="space-y-4">
+  <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+    <div>
+      <label for="time_range" class="block text-sm font-medium text-slate-700">Período</label>
+      <select
+        id="time_range"
+        name="time_range"
+        class="mt-2 block w-full rounded-lg border border-slate-300 bg-white px-4 py-2 text-slate-900 shadow-sm focus:border-emerald-500 focus:outline-none focus:ring-emerald-500"
+      >
+        <% if time_range == "1h" %>
+          <option value="1h" selected>Última hora</option>
+        <% else %>
+          <option value="1h">Última hora</option>
+        <% end %>
+
+        <% if time_range == "24h" %>
+          <option value="24h" selected>Últimas 24 horas</option>
+        <% else %>
+          <option value="24h">Últimas 24 horas</option>
+        <% end %>
+
+        <% if time_range == "7d" %>
+          <option value="7d" selected>Últimos 7 dias</option>
+        <% else %>
+          <option value="7d">Últimos 7 dias</option>
+        <% end %>
+
+        <% if time_range == "all" %>
+          <option value="all" selected>Todos os registros</option>
+        <% else %>
+          <option value="all">Todos os registros</option>
+        <% end %>
+      </select>
+    </div>
+
+    <div>
+      <label for="temp_range" class="block text-sm font-medium text-slate-700">Faixa de Temperatura</label>
+      <select
+        id="temp_range"
+        name="temp_range"
+        class="mt-2 block w-full rounded-lg border border-slate-300 bg-white px-4 py-2 text-slate-900 shadow-sm focus:border-emerald-500 focus:outline-none focus:ring-emerald-500"
+      >
+        <% if temp_range == "all" %>
+          <option value="all" selected>Todas</option>
+        <% else %>
+          <option value="all">Todas</option>
+        <% end %>
+
+        <% if temp_range == "cold" %>
+          <option value="cold" selected>Frio (≤15°C)</option>
+        <% else %>
+          <option value="cold">Frio (≤15°C)</option>
+        <% end %>
+
+        <% if temp_range == "normal" %>
+          <option value="normal" selected>Normal (15°C - 30°C)</option>
+        <% else %>
+          <option value="normal">Normal (15°C - 30°C)</option>
+        <% end %>
+
+        <% if temp_range == "hot" %>
+          <option value="hot" selected>Quente (≥30°C)</option>
+        <% else %>
+          <option value="hot">Quente (≥30°C)</option>
+        <% end %>
+      </select>
+    </div>
+  </div>
+</form>
