@@ -12,7 +12,7 @@ class TemperatureReadingsController < ApplicationController
     readings = filter_by_temperature_range(readings, @temp_range)
 
     @average_temperature_filtered = readings.average(:temperature_c) || 0
-    @temperature_readings = readings.limit(PER_PAGE).to_a
+    @temperature_readings = readings
     @chart_series = build_chart_series(@temperature_readings.reverse)
     @average_temperature = TemperatureReading.where(recorded_at: 24.hours.ago..).average(:temperature_c) || 0
 
@@ -45,14 +45,12 @@ class TemperatureReadingsController < ApplicationController
   def filter_by_temperature_range(relation, temp_range)
     case temp_range
     when "cold"
-      relation.where("temperature_c <= ?", TemperatureReadingsHelper::COLD_TEMPERATURE_C)
+      relation.where(temperature_c: ..TemperatureReadingsHelper::COLD_TEMPERATURE_C)
     when "hot"
-      relation.where("temperature_c >= ?", TemperatureReadingsHelper::HOT_TEMPERATURE_C)
+      relation.where(temperature_c: TemperatureReadingsHelper::HOT_TEMPERATURE_C..)
     when "normal"
       relation.where(
-        "temperature_c > ? AND temperature_c < ?",
-        TemperatureReadingsHelper::COLD_TEMPERATURE_C,
-        TemperatureReadingsHelper::HOT_TEMPERATURE_C
+        temperature_c: TemperatureReadingsHelper::COLD_TEMPERATURE_C..TemperatureReadingsHelper::HOT_TEMPERATURE_C
       )
     else 
       relation
@@ -87,21 +85,19 @@ class TemperatureReadingsController < ApplicationController
 
   def source_sort_order(source)
     case source
-    when TemperatureReading::SOURCE_ARDUINO
-      0
-    when TemperatureReading::SOURCE_OPEN_METEO
-      1
-    else
+    when TemperatureReading::SOURCE_ARDUINO then 0
+    when TemperatureReading::SOURCE_OPEN_METEO then 1
+    when TemperatureReading::SOURCE_SEED_DATA then 2
+    else 
       99
     end
   end
 
   def source_display_name(source)
     case source
-    when TemperatureReading::SOURCE_ARDUINO
-      "Arduino"
-    when TemperatureReading::SOURCE_OPEN_METEO
-      "Open-Meteo"
+    when TemperatureReading::SOURCE_ARDUINO then "Arduino"
+    when TemperatureReading::SOURCE_OPEN_METEO then "Leitura externa (Open-Meteo)"
+    when TemperatureReading::SOURCE_SEED_DATA then "Arduino"
     else
       source.to_s.titleize
     end

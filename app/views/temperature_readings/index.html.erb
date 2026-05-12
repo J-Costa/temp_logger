@@ -27,12 +27,12 @@
       </div>
     </section>
 
+    <%= render "temperature_chart", chart_series: @chart_series %>
+
     <section class="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
       <h2 class="mb-4 text-lg font-semibold text-slate-900">Filtros</h2>
       <%= render "temperature_filter", time_range: @time_range, temp_range: @temp_range %>
     </section>
-
-    <%= render "temperature_chart", chart_series: @chart_series %>
 
     <section id="temperature-readings-list">
       <%= render "temperature_readings_list", temperature_readings: @temperature_readings %>
